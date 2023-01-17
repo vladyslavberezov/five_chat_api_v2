@@ -1,11 +1,13 @@
 /** operationIds */
 export enum OperationIds {
-
   HEALTH_CHECK = 'getHealth',
 
   USERS_FIND_ONE = 'findOne',
   USERS_CREATE = 'create',
   USERS_GET_ME = 'getMe',
+
+  CONTACT_ADD = 'add contact',
+  GET_USER_CONTACTS = 'get user contacts',
 
   AUTH_REGISTER = 'register',
   AUTH_LOGIN = 'login',
@@ -15,5 +17,4 @@ export enum OperationIds {
   AUTH_RESEND_ACTIVATION_LINK = 'resendActivateLink',
   AUTH_USER_CONFIRM = 'userConfirm',
   AUTH_RESET_CHECK = 'resetPasswordCheck',
-
 }

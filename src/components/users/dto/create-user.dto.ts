@@ -1,34 +1,28 @@
-import { ApiProperty } from '@nestjs/swagger'
-import {
-  IsString,
-  IsNotEmpty,
-  IsEmail,
-  IsOptional,
-  MinLength,
-} from 'class-validator'
-import { IsValidPassword } from '../../../core/validators'
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsValidPassword } from '../../../core/validators';
 
 /** register user payload */
 export class CreateUserReqDto {
   @ApiProperty({ required: false, format: 'string' })
   @IsOptional()
   @IsString()
-  public firstName?: string
+  public firstName?: string;
 
   @ApiProperty({ required: false, format: 'string' })
   @IsOptional()
   @IsString()
-  public lastName?: string
+  public lastName?: string;
 
   @ApiProperty({ required: true, format: 'string' })
   @IsString()
   @MinLength(2)
-  public nickname: string
+  public nickname: string;
 
   @ApiProperty({ required: true, format: 'string' })
   @IsString()
   @IsValidPassword()
-  public password: string
+  public password: string;
 
   @ApiProperty({ required: false, format: 'string' })
   @IsOptional()
@@ -38,7 +32,5 @@ export class CreateUserReqDto {
     allow_ip_domain: false,
     domain_specific_validation: true,
   })
-  public email?: string
-
-
+  public email?: string;
 }

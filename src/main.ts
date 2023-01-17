@@ -1,32 +1,32 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { NestFactory } from '@nestjs/core'
-import { Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common'
-import helmet from 'helmet'
-import * as compression from 'compression'
-import { useContainer } from 'class-validator'
-import * as pinoLogger from 'nestjs-pino'
-import * as bodyParser from 'body-parser'
-import 'dotenv/config'
+import { NestFactory } from '@nestjs/core';
+import { Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import * as compression from 'compression';
+import { useContainer } from 'class-validator';
+import * as pinoLogger from 'nestjs-pino';
+import * as bodyParser from 'body-parser';
+import 'dotenv/config';
 
-const Sentry = require('@sentry/node')
-const Tracing = require('@sentry/tracing')
+const Sentry = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
 
-import { AppModule } from './app.module'
-import { buildDocs } from './docs'
-import { IS_NODE_DEVELOPMENT, IS_NODE_PRODUCTION } from './core/helpers/enviroment'
-import config from './config'
+import { AppModule } from './app.module';
+import { buildDocs } from './docs';
+import { IS_NODE_DEVELOPMENT, IS_NODE_PRODUCTION } from './core/helpers/enviroment';
+import config from './config';
 
 async function bootstrap() {
-  const { Logger: PinoDefaultLogger } = pinoLogger
+  const { Logger: PinoDefaultLogger } = pinoLogger;
 
-  const nestConfig: NestApplicationOptions = { cors: config.corsEnabled }
+  const nestConfig: NestApplicationOptions = { cors: config.corsEnabled };
 
   if (!IS_NODE_DEVELOPMENT) {
-    nestConfig.logger = false
+    nestConfig.logger = false;
   }
 
   /** app instance */
-  const app = await NestFactory.create(AppModule, nestConfig)
+  const app = await NestFactory.create(AppModule, nestConfig);
   if (IS_NODE_PRODUCTION) {
     Sentry.init({
       dsn: 'https://72e0a633b8b048ccb8e0aa5c67a1fc1e@o548694.ingest.sentry.io/4503930282835968',
@@ -44,30 +44,29 @@ async function bootstrap() {
       // We recommend adjusting this value in production, or using tracesSampler
       // for finer control
       tracesSampleRate: 1.0,
-    })
+    });
 
-
-    app.use(Sentry.Handlers.requestHandler())
+    app.use(Sentry.Handlers.requestHandler());
     // TracingHandler creates a trace for every incoming request
-    app.use(Sentry.Handlers.tracingHandler())
+    app.use(Sentry.Handlers.tracingHandler());
     // the rest of your app
 
-    app.use(Sentry.Handlers.errorHandler())
+    app.use(Sentry.Handlers.errorHandler());
   }
   if (!IS_NODE_DEVELOPMENT) {
-    app.useLogger(app.get(PinoDefaultLogger))
+    app.useLogger(app.get(PinoDefaultLogger));
   }
-  app.setGlobalPrefix('api/v2')
+  app.setGlobalPrefix('api/v2');
 
-  useContainer(app.select(AppModule), { fallbackOnErrors: true })
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   /** validate all request dtos */
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   // app.useWebSocketAdapter(new RedisIoAdapter(app))
 
   /** security tweaks */
   if (!IS_NODE_DEVELOPMENT) {
-    app.use(helmet())
+    app.use(helmet());
   }
   //TODO: just for test
   // if (false && IS_NODE_PRODUCTION) {
@@ -81,27 +80,27 @@ async function bootstrap() {
   // }
 
   /** compress responses */
-  app.use(compression())
+  app.use(compression());
 
-  app.use(bodyParser.text({ limit: config.requestLimit }))
-  app.use(bodyParser.raw({ limit: config.requestLimit }))
-  app.use(bodyParser.json({ limit: config.requestLimit }))
-  app.use(bodyParser.urlencoded({ limit: config.requestLimit, extended: true }))
+  app.use(bodyParser.text({ limit: config.requestLimit }));
+  app.use(bodyParser.raw({ limit: config.requestLimit }));
+  app.use(bodyParser.json({ limit: config.requestLimit }));
+  app.use(bodyParser.urlencoded({ limit: config.requestLimit, extended: true }));
 
   /** swagger config */
   if (IS_NODE_DEVELOPMENT) {
-    buildDocs(app)
+    buildDocs(app);
   }
 
   /** listen to 0.0.0.0 will make server config easier */
-  await app.listen(config.http.port, '0.0.0.0')
+  await app.listen(config.http.port, '0.0.0.0');
 
   if (IS_NODE_DEVELOPMENT) {
     /** logger instance */
-    const logger = new Logger('bootstrap')
+    const logger = new Logger('bootstrap');
 
-    logger.log(`app is listening on port ${config.http.port}`)
+    logger.log(`app is listening on port ${config.http.port}`);
   }
 }
 
-bootstrap()
+bootstrap();

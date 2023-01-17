@@ -1,5 +1,5 @@
 /** Env specific config */
-import * as process from 'process'
+import * as process from 'process';
 
 module.exports = {
   dbPort: process.env.DB_PORT,

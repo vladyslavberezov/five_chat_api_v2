@@ -1,1 +1,1 @@
-export * from './IsValidPassword'
+export * from './IsValidPassword';

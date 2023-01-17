@@ -1,10 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 /** id request */
 export class CommonPathReqDto {
   /** id */
   @ApiProperty({ required: true, format: 'string' })
-  @IsMongoId()
+  @Transform((v) => {
+    console.log('v', v);
+    return v;
+  })
   id: string;
 }

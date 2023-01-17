@@ -1,4 +1,4 @@
-import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
+import { applyDecorators, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
@@ -11,7 +11,7 @@ import { ApiBearerAuth, ApiUnauthorizedResponse } from '@nestjs/swagger';
  * @param {IComposeAuthDecoratorOptions} options - optional parameter
  */
 export function ComposeAuthDecorator() {
-  const decorators = [ApiBearerAuth(), ApiUnauthorizedResponse({ description: 'Unauthorizeddddd' })];
+  const decorators = [ApiBearerAuth(), ApiUnauthorizedResponse({ description: 'Unauthorized' })];
 
   const guards: any = [AuthGuard('jwt')];
 

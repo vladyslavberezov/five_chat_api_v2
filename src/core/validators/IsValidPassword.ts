@@ -14,11 +14,13 @@ export function IsValidPassword(validationOptions?: ValidationOptions) {
           // const hasSymbols = /[!@#$%^&*?_~]/g;
           const hasCapitalAlpha = /[A-Z]/g;
           const hasAlpha = /[a-z]/g;
-          return value.length >= 10
-            && value.match(hasCapitalAlpha)?.length >= 2
-            && value.match(hasAlpha)?.length >= 2
-            && value.match(hasNumber)?.length >= 1;
-            // && value.match(hasSymbols)?.length >= 2;
+          return (
+            value.length >= 10 &&
+            value.match(hasCapitalAlpha)?.length >= 2 &&
+            value.match(hasAlpha)?.length >= 2 &&
+            value.match(hasNumber)?.length >= 1
+          );
+          // && value.match(hasSymbols)?.length >= 2;
         },
       },
     });

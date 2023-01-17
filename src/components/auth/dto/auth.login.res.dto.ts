@@ -1,6 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { IsDate } from 'class-validator'
-
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDate } from 'class-validator';
 
 /** login response */
 export class AuthLoginResDto {
@@ -8,10 +7,9 @@ export class AuthLoginResDto {
   @ApiProperty({
     format: 'string',
   })
-  accessToken: string
+  accessToken: string;
 
   @ApiProperty({ required: true, format: 'date' })
   @IsDate()
   expiresAt: string;
-
 }

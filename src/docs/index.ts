@@ -15,7 +15,7 @@ function buildDocs(app: INestApplication) {
     .setVersion(config.swagger.version)
     .addBearerAuth();
 
-  Object.values(tags).forEach(tag => documentBuilder.addTag(tag));
+  Object.values(tags).forEach((tag) => documentBuilder.addTag(tag));
 
   SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, documentBuilder.build()));
 }

@@ -1,8 +1,7 @@
 import { CreateOptions } from 'sequelize/types/model';
 import { Model } from 'sequelize-typescript';
-import { DestroyOptions, FindOptions } from 'sequelize'
+import { DestroyOptions, FindOptions } from 'sequelize';
 import { BaseModel } from './base-sequelize.model';
-
 
 /**
  * BaseSequelizeRepository - using for wrapping repositories and implement base sequelize methods
@@ -12,8 +11,7 @@ class BaseSequelizeRepository<T = typeof BaseModel, M = BaseModel> {
    * BaseSequelizeRepository
    * @param model - inject sequelize Model
    */
-  constructor(protected readonly model: typeof BaseModel) {
-  }
+  constructor(protected readonly model: typeof BaseModel) {}
 
   /**
    * create func
@@ -25,19 +23,20 @@ class BaseSequelizeRepository<T = typeof BaseModel, M = BaseModel> {
     return this.model.create<Model<T>>(data as any, options);
   }
 
-
   /** delete - deletes objects
    * @param  data - any param, which is the body for getting the document
-   * @param options
+   * @param  options?: - destroy options
    * @returns  number of destroy rows
    */
-  async delete<T>(data: Partial<M> , options?: DestroyOptions<T>) {
+  async delete<T>(data: Partial<M>, options?: DestroyOptions<T>) {
     return this.model.destroy(data);
   }
 
-
   findOne(data: FindOptions<Partial<M>>) {
     return this.model.findOne<Model<T>>(data as any);
+  }
+  findAll(data: FindOptions<Partial<M>>) {
+    return this.model.findAll<Model<T>>(data as any);
   }
 
   getByPk(id: number) {

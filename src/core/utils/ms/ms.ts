@@ -7,44 +7,41 @@ const w = d * 7;
 const y = d * 365.25;
 
 type Unit =
-| 'Years'
-| 'Year'
-| 'Yrs'
-| 'Yr'
-| 'Y'
-| 'Weeks'
-| 'Week'
-| 'W'
-| 'Days'
-| 'Day'
-| 'D'
-| 'Hours'
-| 'Hour'
-| 'Hrs'
-| 'Hr'
-| 'H'
-| 'Minutes'
-| 'Minute'
-| 'Mins'
-| 'Min'
-| 'M'
-| 'Seconds'
-| 'Second'
-| 'Secs'
-| 'Sec'
-| 's'
-| 'Milliseconds'
-| 'Millisecond'
-| 'Msecs'
-| 'Msec'
-| 'Ms';
+  | 'Years'
+  | 'Year'
+  | 'Yrs'
+  | 'Yr'
+  | 'Y'
+  | 'Weeks'
+  | 'Week'
+  | 'W'
+  | 'Days'
+  | 'Day'
+  | 'D'
+  | 'Hours'
+  | 'Hour'
+  | 'Hrs'
+  | 'Hr'
+  | 'H'
+  | 'Minutes'
+  | 'Minute'
+  | 'Mins'
+  | 'Min'
+  | 'M'
+  | 'Seconds'
+  | 'Second'
+  | 'Secs'
+  | 'Sec'
+  | 's'
+  | 'Milliseconds'
+  | 'Millisecond'
+  | 'Msecs'
+  | 'Msec'
+  | 'Ms';
 
 type UnitAnyCase = Unit | Uppercase<Unit> | Lowercase<Unit>;
 
-export type StringValue =
-| `${number}`
-| `${number}${UnitAnyCase}`
-| `${number} ${UnitAnyCase}`;
+export type StringValue = `${number}` | `${number}${UnitAnyCase}` | `${number} ${UnitAnyCase}`;
 
 interface Options {
   /**
@@ -69,12 +66,12 @@ function msFn(value: StringValue | number, options?: Options): number | string {
     } else if (typeof value === 'number' && isFinite(value)) {
       return options?.long ? fmtLong(value) : fmtShort(value);
     }
-     new Error('Value is not a string or number.');
+    new Error('Value is not a string or number.');
   } catch (error) {
     const message = isError(error)
       ? `${error.message}. value=${JSON.stringify(value)}`
       : 'An unknown error has occurred.';
-     new Error(message);
+    new Error(message);
   }
 }
 
@@ -142,13 +139,10 @@ function parse(str: string): number {
       return n;
     default:
       // This should never occur.
-      throw new Error(
-        `The unit ${type as string} was matched, but no matching case exists.`,
-      );
+      throw new Error(`The unit ${type as string} was matched, but no matching case exists.`);
   }
 }
 
-// eslint-disable-next-line import/no-default-export
 export default msFn;
 
 /**
@@ -194,12 +188,7 @@ function fmtLong(ms: number): StringValue {
 /**
  * Pluralization helper.
  */
-function plural(
-  ms: number,
-  msAbs: number,
-  n: number,
-  name: string,
-): StringValue {
+function plural(ms: number, msAbs: number, n: number, name: string): StringValue {
   const isPlural = msAbs >= n * 1.5;
   return `${Math.round(ms / n)} ${name}${isPlural ? 's' : ''}` as StringValue;
 }
