@@ -8,6 +8,7 @@ export enum OperationIds {
 
   CONTACT_ADD = 'add contact',
   GET_USER_CONTACTS = 'get user contacts',
+  DELETE_USER_CONTACT = 'delete user contact',
 
   AUTH_REGISTER = 'register',
   AUTH_LOGIN = 'login',

@@ -2,7 +2,6 @@ import { BadRequestException, ConflictException, Injectable } from '@nestjs/comm
 import { BaseService } from '../../../core/base-services/base-service';
 import { Contact, TModelContact } from './entities/contact.entity';
 import { ContactRepository } from './entities/contact.repository';
-import { User } from '../entities/user.entity';
 
 @Injectable()
 export class ContactService extends BaseService<typeof Contact, Contact> {
@@ -17,7 +16,6 @@ export class ContactService extends BaseService<typeof Contact, Contact> {
         contactUserId,
       },
     });
-
     if (userId === contactUserId) {
       throw new BadRequestException(`User can't have himself in his contacts!`);
     }
@@ -37,13 +35,17 @@ export class ContactService extends BaseService<typeof Contact, Contact> {
   }
 
   getUserContacts(userId) {
-    return this.contactRepository.findAll({
-      where: { userId },
-      include: {
-        model: User,
-        as: 'contact',
-        attributes: ['id', 'firstName', 'lastName', 'lastOnline', 'nickname'],
-      },
-    });
+    return this.contactRepository.getUserContacts(userId);
+  }
+
+  async deleteUserContact(userId: number, contactUserId: number): Promise<number> {
+    if (userId === contactUserId) {
+      throw new BadRequestException(`User can't delete himself from his contacts!)`);
+    }
+    const contacts = await this.getUserContacts(userId);
+    if (!contacts) {
+      throw new ConflictException(`This user not in your contact!`);
+    }
+    return this.contactRepository.delete({ where: { contactUserId: contactUserId } });
   }
 }

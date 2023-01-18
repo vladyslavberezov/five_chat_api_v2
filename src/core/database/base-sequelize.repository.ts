@@ -24,12 +24,11 @@ class BaseSequelizeRepository<T = typeof BaseModel, M = BaseModel> {
   }
 
   /** delete - deletes objects
-   * @param  data - any param, which is the body for getting the document
    * @param  options?: - destroy options
    * @returns  number of destroy rows
    */
-  async delete<T>(data: Partial<M>, options?: DestroyOptions<T>) {
-    return this.model.destroy(data);
+  async delete(options?: DestroyOptions<Partial<M>>) {
+    return this.model.destroy(options);
   }
 
   findOne(data: FindOptions<Partial<M>>) {

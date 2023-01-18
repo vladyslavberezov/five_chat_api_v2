@@ -25,15 +25,15 @@ export class BaseService<T = typeof BaseModel, M = BaseModel> {
     return this.baseRepository.create(data, options);
   }
 
-  findOne(data): Promise<Model<T, T>> {
-    return this.baseRepository.findOne({
-      where: {},
-      attributes: {
-        include: ['password'],
-      },
-      raw: true,
-    });
-  }
+  // findOne(data: Partial<M>): Promise<Model<T, T>> {
+  //   return this.baseRepository.findOne({
+  //     where: {},
+  //     attributes: {
+  //       include: ['password'],
+  //     },
+  //     raw: true,
+  //   });
+  // }
 
   // /**
   //  * insertMany func - insert many any items

@@ -2,6 +2,6 @@
  * user data from the request;
  */
 export interface ICommonUserDataReq {
-  id: string;
+  userId: number;
   nickname: string;
 }

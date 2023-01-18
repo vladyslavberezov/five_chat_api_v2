@@ -31,11 +31,4 @@ export class AuthService {
       expiresAt: new Date(Date.now() + expiresInMs),
     };
   }
-
-  async validateToken(nickname: string, password: string): Promise<any> {
-    console.log(nickname, password);
-    const user = await this.usersService.findOne({ nickname, password });
-
-    return user ?? null;
-  }
 }

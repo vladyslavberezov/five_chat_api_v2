@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Logger, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Post, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserReqDto } from './dto/create-user.dto';
 import { ApiBody, ApiInternalServerErrorResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -10,6 +10,9 @@ import { ComposeAuthDecorator } from '../../core/decorators/compose-auth.decorat
 import { CreateContactReqDto } from './contacts/dto/create-contact.dto';
 import { TModelContact } from './contacts/entities/contact.entity';
 import { ContactService } from './contacts/contact.service';
+import { DeleteContactDto } from './contacts/dto/delete-contact.dto';
+import { ICommonUserDataReq } from '../../dto/common.user.data.req';
+import { User } from '../../core/decorators/user.decorator';
 
 @Controller('users')
 export class UserController {
@@ -69,7 +72,7 @@ export class UserController {
   /**
    * / endpoint handler - add contact
    * @param {CreateContactReqDto} body - create object
-   * @param req
+   * @param user
    * @returns {CommonSuccessResDto} - { success: true }
    */
   @Post('contacts')
@@ -88,8 +91,8 @@ export class UserController {
     type: CommonServerErrorResDto,
     description: 'internal server error',
   })
-  addContact(@Body() body: CreateContactReqDto, @Request() req): Promise<TModelContact> {
-    return this.contactsService.addContact(req.user.userId, body.contactUserId);
+  addContact(@Body() body: CreateContactReqDto, @User() user: ICommonUserDataReq): Promise<TModelContact> {
+    return this.contactsService.addContact(user.userId, body.contactUserId);
   }
 
   /**
@@ -110,48 +113,33 @@ export class UserController {
     type: CommonServerErrorResDto,
     description: 'internal server error',
   })
-  getUserContacts(@Request() req) {
-    return this.contactsService.getUserContacts(req.user.userId);
+  getUserContacts(@User() user: ICommonUserDataReq) {
+    return this.contactsService.getUserContacts(user.userId);
   }
 
-  //
-  // @Get()
-  // getAll() {
-  //   return this.usersService.getAll()
-  // }
-  //
-  // @Get('/me')
-  // findMe( @Param('id') id: string ) {
-  //   return this.usersService.findOne(+id)
-  // }
-  //
-  // @Delete(':id')
-  // delete( @Param('id') id: string ) {
-  //   return this.usersService.delete(+id)
-  // }
-  //
-  // @Get(':id')
-  // findOne( @Param('id') id: string ) {
-  //   return this.usersService.findOne(+id)
-  // }
-  //
-  // @Get(':id/contact')
-  // getUserContacts( @Param('id') id: string ) {
-  //   return this.contactService.findOne(+id)
-  // }
-  //
-  // @Post(':id/contact')
-  // addContact( @Body() UserDto: UserDto ) {
-  //   return this.contactService.create(UserDto)
-  // }
-  //
-  // @Delete(':id/contact/:contactId')
-  // deleteContact( @Param('id') id: string ) {
-  //   return this.contactService.delete(+id)
-  // }
-
-  // @Patch(':id')
-  // update( @Param('id') id: string, @Body() updateUserDto: UpdateUserDto ) {
-  //   return this.usersService.update(+id, updateUserDto)
-  // }
+  /**
+   * / endpoint handler - delete user from contact
+   * @param user
+   * @param {DeleteContactDto} body - contact id to delete
+   * @returns {CommonSuccessResDto} - { success: true }
+   */
+  @Delete('contact')
+  @ComposeAuthDecorator()
+  @ApiOperation({
+    description: 'delete contact',
+    operationId: OperationIds.DELETE_USER_CONTACT,
+  })
+  @ApiBody({ type: DeleteContactDto })
+  @ApiResponse({
+    status: 201,
+    description: 'OK',
+    type: CommonSuccessResDto,
+  })
+  @ApiInternalServerErrorResponse({
+    type: CommonServerErrorResDto,
+    description: 'internal server error',
+  })
+  deleteUserContact(@User() user: ICommonUserDataReq, @Body() body: DeleteContactDto): Promise<number> {
+    return this.contactsService.deleteUserContact(user.userId, body.contactUserId);
+  }
 }
