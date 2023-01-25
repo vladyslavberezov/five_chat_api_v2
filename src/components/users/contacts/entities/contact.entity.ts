@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
 import { InferAttributes, InferCreationAttributes } from 'sequelize';
 import { User } from '../../entities/user.entity';
 
@@ -28,4 +28,5 @@ export class Contact extends Model<InferAttributes<Contact>, InferCreationAttrib
   @ApiProperty({ required: true })
   @BelongsTo(() => User, { foreignKey: 'userId', as: 'user' })
   user: User;
+  static contactUserId: any;
 }

@@ -19,6 +19,16 @@ export class ContactRepository extends BaseSequelizeRepository<typeof Contact, C
         as: 'contact',
         attributes: ['id', 'firstName', 'lastName', 'lastOnline', 'nickname'],
       },
+      raw: true,
+    });
+  }
+
+  getUserContact(userId: number, contactUserId): Promise<TModelContact> {
+    return this.findOne({
+      where: {
+        userId,
+        contactUserId,
+      },
     });
   }
 }

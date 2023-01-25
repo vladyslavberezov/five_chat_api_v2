@@ -10,6 +10,11 @@ export enum OperationIds {
   GET_USER_CONTACTS = 'get user contacts',
   DELETE_USER_CONTACT = 'delete user contact',
 
+  CHAT_CREATE = 'create chat',
+  CHATS_GET_ALL = 'get all user chats',
+  UPDATE_USER_CHAT = 'update user chat',
+  DELETE_USER_CHAT = 'delete user chat',
+
   AUTH_REGISTER = 'register',
   AUTH_LOGIN = 'login',
   AUTH_FORGOT = 'forgotPassword',

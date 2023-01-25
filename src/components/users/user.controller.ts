@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Logger, Post, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserReqDto } from './dto/create-user.dto';
-import { ApiBody, ApiInternalServerErrorResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiInternalServerErrorResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { OperationIds } from '../../core/helpers/objectIds.enum';
 import { CommonSuccessResDto } from '../../dto/common.success.res.dto';
 import { CommonServerErrorResDto } from '../../dto/common.server-error.res.dto';
@@ -13,8 +13,10 @@ import { ContactService } from './contacts/contact.service';
 import { DeleteContactDto } from './contacts/dto/delete-contact.dto';
 import { ICommonUserDataReq } from '../../dto/common.user.data.req';
 import { User } from '../../core/decorators/user.decorator';
+import { USER_TAG } from '../../docs/tags';
 
-@Controller('users')
+@ApiTags(USER_TAG)
+@Controller(USER_TAG)
 export class UserController {
   private readonly logger = new Logger(UserController.name);
 

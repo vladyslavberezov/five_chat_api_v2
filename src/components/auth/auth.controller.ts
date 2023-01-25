@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   ApiBody,
@@ -16,7 +16,6 @@ import { AUTH_TAG } from '../../docs/tags';
 
 @ApiTags(AUTH_TAG)
 @Controller(AUTH_TAG)
-@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { BaseService } from '../../../core/base-services/base-service';
 import { Contact, TModelContact } from './entities/contact.entity';
 import { ContactRepository } from './entities/contact.repository';
@@ -38,13 +38,14 @@ export class ContactService extends BaseService<typeof Contact, Contact> {
     return this.contactRepository.getUserContacts(userId);
   }
 
+  getUserContact(userId, contactUserId) {
+    return this.contactRepository.getUserContact(userId, contactUserId);
+  }
+
   async deleteUserContact(userId: number, contactUserId: number): Promise<number> {
-    if (userId === contactUserId) {
-      throw new BadRequestException(`User can't delete himself from his contacts!)`);
-    }
-    const contacts = await this.getUserContacts(userId);
-    if (!contacts) {
-      throw new ConflictException(`This user not in your contact!`);
+    const contact = await this.getUserContact(userId, contactUserId);
+    if (!contact) {
+      throw new ForbiddenException('Forbidden!');
     }
     return this.contactRepository.delete({ where: { contactUserId: contactUserId } });
   }

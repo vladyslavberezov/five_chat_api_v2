@@ -1,20 +1,21 @@
 import {
-  Table,
-  Column,
-  Model,
-  Unique,
-  CreatedAt,
-  UpdatedAt,
-  DataType,
   AllowNull,
-  HasMany,
   BelongsToMany,
+  Column,
+  CreatedAt,
+  DataType,
+  HasMany,
+  Model,
+  Table,
+  Unique,
+  UpdatedAt,
 } from 'sequelize-typescript';
 import { InferAttributes, InferCreationAttributes } from 'sequelize';
 import { IsDate, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Contact } from '../contacts/entities/contact.entity';
-import { UserChats } from '../../user-chats/entities/user-chats.entity';
+import { UserChats } from '../../chats/user-chats/entities/user-chats.entity';
+import { Chat } from '../../chats/entities/chat.entity';
 
 export type TModelUser = Model<typeof User>;
 
@@ -87,6 +88,15 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     foreignKey: 'userId',
   })
   contacts: User[];
+
+  /**  */
+  @ApiProperty({ required: true })
+  @BelongsToMany(() => Chat, {
+    through: () => UserChats,
+    as: 'user',
+    foreignKey: 'userId',
+  })
+  chat: Chat[];
 
   /**  */
   @ApiProperty({ required: true })

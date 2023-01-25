@@ -11,6 +11,6 @@ import { ContactRepository } from './contacts/entities/contact.repository';
   imports: [DatabaseModule],
   controllers: [UserController],
   providers: [UserService, ContactService, UserRepository, ContactRepository, ...userProviders],
-  exports: [UserService],
+  exports: [UserService, ContactService],
 })
 export class UsersModule {}
