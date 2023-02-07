@@ -61,5 +61,5 @@ export class Chat extends Model<InferAttributes<Chat>, InferCreationAttributes<C
   /**  */
   @ApiProperty({ required: true })
   @HasMany(() => UserChats, 'chatId')
-  userChat: UserChats[];
+  userChats: UserChats[];
 }

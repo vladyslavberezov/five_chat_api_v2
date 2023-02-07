@@ -19,6 +19,17 @@ export type TModelUserChats = Model<typeof UserChats>;
 
 @Table
 export class UserChats extends Model<InferAttributes<UserChats>, InferCreationAttributes<UserChats>> {
+  /** id */
+  @ApiProperty({ required: true, format: 'number' })
+  // @AutoIncrement
+  @Column({
+    allowNull: false,
+    autoIncrement: true,
+    primaryKey: true,
+    type: DataType.INTEGER,
+  })
+  id: number;
+
   /** userId */
   @ApiProperty({ required: true, format: 'number' })
   @ForeignKey(() => User)

@@ -72,6 +72,7 @@ export class ChatRepository extends BaseSequelizeRepository<typeof Chat, Chat> {
       include: [
         {
           model: UserChats,
+          attributes: ['id', 'userId', 'chatId'],
         },
       ],
     });
@@ -101,16 +102,16 @@ export class ChatRepository extends BaseSequelizeRepository<typeof Chat, Chat> {
     return userChat;
   }
 
-  async updateChat(data: any): Promise<Chat> {
+  async updateChat(id: number, title: string): Promise<Chat> {
     const exist = await Chat.findOne({
       where: {
-        id: data.chatId,
+        id: id,
       },
     });
     if (!exist) {
-      throw new ConflictException(`Chat not updated. id: ${data.chatId}`);
+      throw new ConflictException(`Chat not updated. id: ${id}`);
     }
-    exist.title = data.title;
+    exist.title = title;
     return exist.save();
   }
 }

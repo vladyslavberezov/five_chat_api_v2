@@ -2,7 +2,6 @@
 export enum OperationIds {
   HEALTH_CHECK = 'getHealth',
 
-  USERS_FIND_ONE = 'findOne',
   USERS_CREATE = 'create',
   USERS_GET_ME = 'getMe',
 
@@ -15,12 +14,17 @@ export enum OperationIds {
   UPDATE_USER_CHAT = 'update user chat',
   DELETE_USER_CHAT = 'delete user chat',
 
-  AUTH_REGISTER = 'register',
+  GET_ALL_MESSAGES = 'get all messages',
+  SAVE_MESSAGE = 'save message',
+  UPDATE_MESSAGE = 'update message',
+  DELETE_MESSAGE = 'delete message',
+
   AUTH_LOGIN = 'login',
-  AUTH_FORGOT = 'forgotPassword',
-  AUTH_RESET = 'resetPassword',
-  AUTH_BY_TOKEN = 'authByToken',
-  AUTH_RESEND_ACTIVATION_LINK = 'resendActivateLink',
-  AUTH_USER_CONFIRM = 'userConfirm',
-  AUTH_RESET_CHECK = 'resetPasswordCheck',
+  // AUTH_REGISTER = 'register',
+  // AUTH_FORGOT = 'forgotPassword',
+  // AUTH_RESET = 'resetPassword',
+  // AUTH_BY_TOKEN = 'authByToken',
+  // AUTH_RESEND_ACTIVATION_LINK = 'resendActivateLink',
+  // AUTH_USER_CONFIRM = 'userConfirm',
+  // AUTH_RESET_CHECK = 'resetPasswordCheck',
 }

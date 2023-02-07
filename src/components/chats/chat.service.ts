@@ -4,10 +4,16 @@ import { Chat, TModelChat } from './entities/chat.entity';
 import { BaseService } from '../../core/base-services/base-service';
 import { CreateChatReqDto } from './dto/create-chat.dto';
 import { ContactService } from '../users/contacts/contact.service';
+import { UserChats } from './user-chats/entities/user-chats.entity';
+import { MessageService } from './messages/message.service';
 
 @Injectable()
 export class ChatService extends BaseService<typeof Chat, Chat> {
-  constructor(private readonly chatRepository: ChatRepository, private readonly contactService: ContactService) {
+  constructor(
+    private readonly chatRepository: ChatRepository,
+    private readonly contactService: ContactService,
+    private readonly messageService: MessageService,
+  ) {
     super(chatRepository, 'Chat');
   }
 
@@ -36,33 +42,27 @@ export class ChatService extends BaseService<typeof Chat, Chat> {
     return this.chatRepository.getAllChats(userId);
   }
 
-  getChat(userId: number): Promise<any> {
-    return this.chatRepository.getChat(userId);
+  getChat(chatId: number): Promise<Chat> {
+    return this.chatRepository.getChat(chatId);
   }
 
-  async deleteChat(userId: number, chatId: number, query) {
+  async deleteChat(userId: number, chatId, query): Promise<number | UserChats> {
     const { forAll } = query;
-    console.log('userID', userId);
-    console.log('chatId', chatId);
-    console.log('query', query);
     const chat = await this.getChat(chatId);
-    console.log('\n\nCHAT', chat);
-    const userChat = chat.userChat.find((userChat) => userChat.userId === userId);
-    console.log('\n\nuserchat>>>>>>>>>>>', userChat);
-    // const userChat =
-    // const userChat = chat.x
+    const userChat = chat.userChats.find((userChats) => userChats.userId === userId);
     if (!userChat) {
       throw new ForbiddenException('You must be a chat participant');
     }
     if (forAll === 'true') {
       return this.chatRepository.deleteChat(chat.id);
     } else {
-      // await MessagesDAO.deleteUserMessages(userChat.id)
+      await this.messageService.deleteUserMessages(userChat.id);
       return this.chatRepository.updateUserChat(userChat.id, { isDeleted: true });
     }
   }
 
-  async updateChat(data: any): Promise<Chat> {
-    return this.chatRepository.updateChat(data);
+  async updateChat(id: string, title: string): Promise<Chat> {
+    const idNumber = parseInt(id);
+    return this.chatRepository.updateChat(idNumber, title);
   }
 }

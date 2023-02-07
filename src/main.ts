@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { NestFactory } from '@nestjs/core';
 import { Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
-import helmet from 'helmet';
-import * as compression from 'compression';
-import { useContainer } from 'class-validator';
-import * as pinoLogger from 'nestjs-pino';
+import { NestFactory } from '@nestjs/core';
 import * as bodyParser from 'body-parser';
+import { useContainer } from 'class-validator';
+import * as compression from 'compression';
 import 'dotenv/config';
+import helmet from 'helmet';
+import * as pinoLogger from 'nestjs-pino';
+import { AppModule } from './app.module';
+import config from './config';
+import { IS_NODE_DEVELOPMENT, IS_NODE_PRODUCTION } from './core/helpers/enviroment';
+// import { RedisIoAdapter } from './core/socket/src/adapters/redis-io.adapter';
+import { buildDocs } from './docs';
 
 const Sentry = require('@sentry/node');
 const Tracing = require('@sentry/tracing');
-
-import { AppModule } from './app.module';
-import { buildDocs } from './docs';
-import { IS_NODE_DEVELOPMENT, IS_NODE_PRODUCTION } from './core/helpers/enviroment';
-import config from './config';
 
 async function bootstrap() {
   const { Logger: PinoDefaultLogger } = pinoLogger;
@@ -27,6 +27,7 @@ async function bootstrap() {
 
   /** app instance */
   const app = await NestFactory.create(AppModule, nestConfig);
+  // app.useWebSocketAdapter(redisIoAdapter);
   if (IS_NODE_PRODUCTION) {
     Sentry.init({
       dsn: 'https://72e0a633b8b048ccb8e0aa5c67a1fc1e@o548694.ingest.sentry.io/4503930282835968',
@@ -62,7 +63,6 @@ async function bootstrap() {
 
   /** validate all request dtos */
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  // app.useWebSocketAdapter(new RedisIoAdapter(app))
 
   /** security tweaks */
   if (!IS_NODE_DEVELOPMENT) {
@@ -91,6 +91,10 @@ async function bootstrap() {
   if (IS_NODE_DEVELOPMENT) {
     buildDocs(app);
   }
+
+  // const redisIoAdapter = new RedisIoAdapter(app);
+  // await redisIoAdapter.connectToRedis();
+  // app.useWebSocketAdapter(new IoAdapter());
 
   /** listen to 0.0.0.0 will make server config easier */
   await app.listen(config.http.port, '0.0.0.0');

@@ -9,43 +9,42 @@ export class MessageService extends BaseService<typeof Message, Message> {
     super(messageRepository, 'Message');
   }
 
-  // async addMessage(userId: number, contactUserId: number): Promise<TModelMessage> {
-  //   const contact = await this.contactRepository.findOne({
-  //     where: {
-  //       userId,
-  //       contactUserId,
-  //     },
-  //   });
-  //   if (userId === contactUserId) {
-  //     throw new BadRequestException(`User can't have himself in his contacts!`);
+  getAll(userId: number, chatId: string): Promise<Message[]> {
+    const chatIdNum = parseInt(chatId);
+    return this.messageRepository.getAll(userId, chatIdNum);
+  }
+
+  saveMessage(userId, body) {
+    return this.messageRepository.saveMessage(userId, body);
+  }
+
+  deleteMessage(id) {
+    return this.messageRepository.deleteMessage(id);
+  }
+
+  deleteUserMessages(userChatId: number): Promise<number> {
+    return this.messageRepository.delete({ where: { userChatId } });
+  }
+
+  // async changeMessage(data) {
+  //   const where = {};
+  //   if (data.id) {
+  //     where.id = data.id;
   //   }
-  //   if (contact) {
-  //     throw new ConflictException('User already in your contacts!');
+  //   if (data.userChatId) {
+  //     where.userChatId = data.userChatId;
+  //   }
+  //   if (data.uuid) {
+  //     where.uuid = data.uuid;
   //   }
   //
-  //   return this.contactRepository.create(
-  //     {
-  //       userId,
-  //       contactUserId,
-  //     },
-  //     {
-  //       raw: true,
-  //     },
-  //   );
-  // }
-  //
-  // getUserMessages(userId) {
-  //   return this.contactRepository.getUserContacts(userId);
-  // }
-  //
-  // async deleteUserContact(userId: number, contactUserId: number): Promise<number> {
-  //   if (userId === contactUserId) {
-  //     throw new BadRequestException(`User can't delete himself from his contacts!)`);
+  //   const message = await Message.findOne({ where });
+  //   if (!message) {
+  //     throw Error(`Message not found.`);
   //   }
-  //   const contacts = await this.getUserContacts(userId);
-  //   if (!contacts) {
-  //     throw new ConflictException(`This user not in your contact!`);
-  //   }
-  //   return this.contactRepository.delete({ where: { contactUserId: contactUserId } });
+  //
+  //   Object.assign(message, data);
+  //   await message.save();
+  //   return message;
   // }
 }
