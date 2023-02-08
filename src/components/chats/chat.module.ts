@@ -7,9 +7,8 @@ import { chatProviders } from './entities/chat.providers';
 import { ChatRepository } from './entities/chat.repository';
 import { MessageRepository } from './messages/entities/message.repository';
 import { MessageService } from './messages/message.service';
-// import { ChatsSocketsGateway } from './socket/chats.sockets.gateway';
+import { ChatsSocketsGateway } from './socket/chats.sockets.gateway';
 import { UserChatsRepository } from './user-chats/entities/user-chats.repository';
-// import { ChatsSocketsGateway } from './socket/chats.sockets.gateway';
 import { UserChatsService } from './user-chats/user-chats.service';
 
 @Module({
@@ -18,7 +17,7 @@ import { UserChatsService } from './user-chats/user-chats.service';
   providers: [
     ChatService,
     UserChatsService,
-    // ChatsSocketsGateway,
+    ChatsSocketsGateway,
     MessageService,
     ChatRepository,
     UserChatsRepository,
