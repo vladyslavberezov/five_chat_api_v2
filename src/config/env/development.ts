@@ -40,8 +40,9 @@ module.exports = {
     mailVersion: 'v3.1',
   },
   redis: {
-    port: 6379,
-    host: 'localhost',
+    url: 'redis://localhost:6379',
+    // port: 6379,
+    // host: 'localhost',
     // password: null,
   },
   subdomains: false,

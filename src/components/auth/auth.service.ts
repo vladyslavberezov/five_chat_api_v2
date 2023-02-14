@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import config from '../../config';
 import * as bcrypt from 'bcrypt';
+import config from '../../config';
+import ms from '../../core/utils/ms/ms';
 import { UserService } from '../users/user.service';
 import { AuthLoginReqDto } from './dto/auth.login.req.dto';
-import ms from '../../core/utils/ms/ms';
 
 @Injectable()
 export class AuthService {
@@ -30,5 +30,10 @@ export class AuthService {
       accessToken: this.jwtService.sign(payload),
       expiresAt: new Date(Date.now() + expiresInMs),
     };
+  }
+
+  checkAuth(client): Promise<any> {
+    const { authorization: accessToken } = client.handshake.headers;
+    return this.jwtService.verifyAsync(accessToken, { secret: config.jwtSecret });
   }
 }

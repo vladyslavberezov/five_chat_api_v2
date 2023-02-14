@@ -10,12 +10,12 @@ export class MessageService extends BaseService<typeof Message, Message> {
   }
 
   getAll(userId: number, chatId: string): Promise<Message[]> {
-    const chatIdNum = parseInt(chatId);
+    const chatIdNum: number = parseInt(chatId);
     return this.messageRepository.getAll(userId, chatIdNum);
   }
 
-  saveMessage(userId, body) {
-    return this.messageRepository.saveMessage(userId, body);
+  saveMessage(data) {
+    return this.messageRepository.saveMessage(data);
   }
 
   deleteMessage(id) {

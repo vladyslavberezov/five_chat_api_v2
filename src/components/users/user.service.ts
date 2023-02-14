@@ -1,10 +1,10 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { UserRepository } from './entities/user.repository';
-import { TModelUser, User } from './entities/user.entity';
 import { BaseService } from '../../core/base-services/base-service';
-import { CreateUserReqDto } from './dto/create-user.dto';
 import { AuthLoginReqDto } from '../auth/dto/auth.login.req.dto';
+import { CreateUserReqDto } from './dto/create-user.dto';
+import { TModelUser, User } from './entities/user.entity';
+import { UserRepository } from './entities/user.repository';
 
 @Injectable()
 export class UserService extends BaseService<typeof User, User> {

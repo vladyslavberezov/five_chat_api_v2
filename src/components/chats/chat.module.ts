@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../core/database/database.module';
+import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/user.module';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
@@ -12,7 +13,7 @@ import { UserChatsRepository } from './user-chats/entities/user-chats.repository
 import { UserChatsService } from './user-chats/user-chats.service';
 
 @Module({
-  imports: [DatabaseModule, UsersModule],
+  imports: [DatabaseModule, UsersModule, AuthModule],
   controllers: [ChatController],
   providers: [
     ChatService,

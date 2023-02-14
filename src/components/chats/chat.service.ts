@@ -1,11 +1,11 @@
 import { ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
-import { ChatRepository } from './entities/chat.repository';
-import { Chat, TModelChat } from './entities/chat.entity';
 import { BaseService } from '../../core/base-services/base-service';
-import { CreateChatReqDto } from './dto/create-chat.dto';
 import { ContactService } from '../users/contacts/contact.service';
-import { UserChats } from './user-chats/entities/user-chats.entity';
+import { CreateChatReqDto } from './dto/create-chat.dto';
+import { Chat, TModelChat } from './entities/chat.entity';
+import { ChatRepository } from './entities/chat.repository';
 import { MessageService } from './messages/message.service';
+import { UserChats } from './user-chats/entities/user-chats.entity';
 
 @Injectable()
 export class ChatService extends BaseService<typeof Chat, Chat> {
@@ -48,21 +48,29 @@ export class ChatService extends BaseService<typeof Chat, Chat> {
 
   async deleteChat(userId: number, chatId, query): Promise<number | UserChats> {
     const { forAll } = query;
-    const chat = await this.getChat(chatId);
-    const userChat = chat.userChats.find((userChats) => userChats.userId === userId);
-    if (!userChat) {
-      throw new ForbiddenException('You must be a chat participant');
-    }
+    const validate = await this.validateChat(userId, chatId);
     if (forAll === 'true') {
-      return this.chatRepository.deleteChat(chat.id);
+      return this.chatRepository.deleteChat(validate.chat.id);
     } else {
-      await this.messageService.deleteUserMessages(userChat.id);
-      return this.chatRepository.updateUserChat(userChat.id, { isDeleted: true });
+      await this.messageService.deleteUserMessages(validate.userChat.id);
+      return this.chatRepository.updateUserChat(validate.userChat.id, { isDeleted: true });
     }
   }
 
   async updateChat(id: string, title: string): Promise<Chat> {
     const idNumber = parseInt(id);
     return this.chatRepository.updateChat(idNumber, title);
+  }
+
+  async validateChat(userId: number, chatId: number) {
+    const chat = await this.getChat(chatId);
+    if (!chat) {
+      throw new ConflictException('Chat not found');
+    }
+    const userChat = chat.userChats.find((userChats) => userChats.userId === userId);
+    if (!userChat) {
+      throw new ForbiddenException('You must be a chat participant');
+    }
+    return { chat, userChat };
   }
 }

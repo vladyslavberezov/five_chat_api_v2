@@ -1,6 +1,6 @@
 import { Global, Module, Provider } from '@nestjs/common';
+import { createClient } from 'redis';
 import config from '../../../config';
-import { createClient } from '../redis';
 
 /** provide tokens */
 const provideTokens = {
@@ -10,7 +10,11 @@ delete config.redis.password;
 /** redis providers */
 export const REDIS_PROVIDERS: Provider[] = [
   {
-    useFactory: () => createClient(config.redis),
+    useFactory: async () => {
+      const client = createClient(config.redis);
+      await client.connect();
+      return client;
+    },
     provide: provideTokens.REDIS_ACTIVE_CONNECTION,
   },
 ];

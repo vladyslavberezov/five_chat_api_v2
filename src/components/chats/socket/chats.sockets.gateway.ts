@@ -1,26 +1,70 @@
-import { ConflictException, Inject } from '@nestjs/common';
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConflictException, Inject, Logger, UnauthorizedException } from '@nestjs/common';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { RedisClientType } from 'redis';
 
 import { Server, Socket } from 'socket.io';
+import { v4 as uuidv4 } from 'uuid';
 import config from '../../../config';
 import { ListenerEnum } from '../../../core/helpers/listeners.enum';
 import { redisKey } from '../../../core/helpers/redisKey';
+import { SocketsActions } from '../../../core/helpers/sockets.actions';
 import { provideTokens } from '../../../core/utils/storage/redis';
-import { Message } from '../messages/entities/message.entity';
+import { AuthService } from '../../auth/auth.service';
+import { ChatService } from '../chat.service';
+import { ChatsMessageCreateReqDto } from '../messages/dto/chat-message-create.req.dto';
+import { MessageService } from '../messages/message.service';
 
 @WebSocketGateway()
 export class ChatsSocketsGateway {
+  constructor(
+    private readonly messageService: MessageService,
+    private readonly chatService: ChatService,
+    private readonly authService: AuthService,
+  ) {}
+
   @WebSocketServer()
   server: Server;
+  /** logger */
+  logger = new Logger(ChatsSocketsGateway.name);
 
   @Inject(provideTokens.REDIS_ACTIVE_CONNECTION)
-  protected readonly redisAsyncClient;
+  protected readonly redisAsyncClient: RedisClientType;
   protected readonly eventEmitter;
 
-  @SubscribeMessage('sendMessage')
-  async handleSendMessage(client: Socket, payload: Message) {
-    // await this.messageService.createMessage(payload);
-    this.server.emit('recMessage', payload);
+  /**
+   * chatCreateMessage - creates a message;
+   * @param {ChatsMessageCreateReqDto} body;
+   * @param {Socket} client - socket client;
+   * @returns {Promise<void>};
+   */
+  @SubscribeMessage(SocketsActions.CHATS_MESSAGE_CREATE)
+  async chatCreateMessage(
+    @MessageBody() body: ChatsMessageCreateReqDto,
+    @ConnectedSocket() client: Socket,
+  ): Promise<any> {
+    try {
+      const user = await this.authService.checkAuth(client);
+      console.log('user', user);
+      const messageUuid = uuidv4();
+      if (!user) {
+        throw new UnauthorizedException('Not authorized!');
+      }
+      const chat = await this.chatService.validateChat(user.sub, body.chatId);
+      chat.chat.userChats.map(async (userChat) => {
+        await this.messageService.saveMessage({
+          authorId: user.sub,
+          userChatId: userChat.id,
+          text: body.message,
+          uuid: messageUuid,
+        });
+        console.log('aaaaa', userChat.userId);
+        const sockets = await this.getUserClients(userChat.userId);
+        console.log('sockets', sockets);
+        this.socketSender(sockets, SocketsActions.CHATS_MESSAGE_CREATE);
+      });
+    } catch (e) {
+      this.server.to(client.id).emit('error', e.message);
+    }
   }
 
   afterInit(server: Server) {
@@ -31,8 +75,45 @@ export class ChatsSocketsGateway {
     console.log(`Disconnected: ${client.id}`);
   }
 
-  handleConnection(client: Socket) {
-    console.log(`Connected ${client.id}`);
+  /**
+   * handleConnection - on connect;
+   * @param {Socket} client - socket client;
+   * @returns {Promise<void>};
+   */
+  async handleConnection(client: Socket): Promise<void> {
+    const user = await this.authService.checkAuth(client);
+    if (user) {
+      console.log('try connect');
+      const userId: string = user.sub.toString();
+      await this.onClientConnect(userId, client.id);
+      console.log('try connect 2');
+    } else {
+      console.log('disconnect');
+      // client.disconnect();
+    }
+    this.logger.log(`Client connected: ${client.id}`);
+  }
+
+  /**
+   * getUserClients - get parsed user string array;
+   * @returns {Promise<string[]>};
+   * @param memberId
+   */
+  private async getUserClients(memberId: number): Promise<string[]> {
+    const memberIdString = memberId.toString();
+    const key = redisKey('userId', memberIdString);
+    const valueType = await this.redisAsyncClient.type(key);
+    console.log('value type', valueType);
+    let activeUser: string[];
+
+    if (valueType === 'string') {
+      const value = await this.redisAsyncClient.get(key);
+      activeUser = value ? JSON.parse(value) : [];
+    } else {
+      activeUser = (await this.redisAsyncClient.sMembers(key)) || [];
+    }
+
+    return activeUser;
   }
 
   /**
@@ -42,10 +123,26 @@ export class ChatsSocketsGateway {
    * @private
    */
   private async getUserClientIds(key: string): Promise<string[]> {
-    if ((await this.redisAsyncClient.asyncClient.type(key)) === 'string')
-      await this.redisAsyncClient.redisAsyncClient.del(key);
+    console.log('get key', key, typeof key);
+    if ((await this.redisAsyncClient.type(key)) === 'string') {
+      await this.redisAsyncClient.del(key);
+    }
+    console.log('get >>>>>>>>>>>>>>>>');
 
-    return this.redisAsyncClient.asyncClient.smembers(key);
+    return this.redisAsyncClient.sMembers(key);
+  }
+
+  /**
+   * socketSender - sends socket;
+   * @returns {void};
+   * @param getUserClients
+   * @param notifyData
+   * @param emitAddress
+   */
+  private socketSender(getUserClients: string[], emitAddress: string, notifyData?): void {
+    for (const clientId of getUserClients) {
+      this.server.to(String(clientId)).emit(emitAddress, notifyData);
+    }
   }
 
   /**
@@ -57,21 +154,31 @@ export class ChatsSocketsGateway {
    */
   private async onClientConnect(userId: string, clientId: string): Promise<void> {
     const key: string = redisKey('userId', userId);
+    console.log('try connect 3');
+
     const clientIds: string[] = (await this.getUserClientIds(key)) || [];
+    console.log('try connect4 ');
+
     clientIds.push(clientId);
+    console.log('clientids', clientIds);
 
     /** remove all inactive clientIds */
+    // const activeClientIds = (await this.getUserClientIds(key)) || [];
     const activeClientIds = [];
     for await (const client_id of clientIds) {
-      !this.server.sockets.sockets[client_id]?.connected
-        ? this.redisAsyncClient.asyncClient.srem(key, client_id)
-        : activeClientIds.push(client_id);
+      console.log(' ???? ', !this.server.sockets.sockets[client_id]?.connected);
+
+      // if (!this.server.sockets.sockets[client_id]?.connected) {
+      //   this.redisAsyncClient.sRem(key, client_id);
+      // } else {
+      activeClientIds.push(client_id);
+      // }
     }
 
-    this.eventEmitter.emit(ListenerEnum.CLIENT_CONNECT, { clientIds: activeClientIds, userId });
+    // this.eventEmitter.emit(ListenerEnum.CLIENT_CONNECT, { clientIds: activeClientIds, userId });
 
-    this.redisAsyncClient.asyncClient
-      .sadd(key, clientId)
+    this.redisAsyncClient
+      .sAdd(key, clientId)
       .then(() => this.redisAsyncClient.expire(key, Number(config.redisExpireIn))) // expires in 2 day
       .catch((e) => {
         throw new ConflictException(e.message, e.statusCode);
@@ -89,7 +196,7 @@ export class ChatsSocketsGateway {
     const key: string = redisKey('userId', userId);
     const usersClientsIds: string[] = (await this.getUserClientIds(key)) || [];
 
-    await this.redisAsyncClient.asyncClient.srem(key, clientId);
+    await this.redisAsyncClient.sRem(key, clientId);
 
     if (usersClientsIds.includes(clientId)) {
       this.eventEmitter.emit(ListenerEnum.CLIENT_DISCONNECT, { clientIds: usersClientsIds, userId });

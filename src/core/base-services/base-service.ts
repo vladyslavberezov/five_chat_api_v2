@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOptions } from 'sequelize/types/model';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'sequelize-typescript';
+import { CreateOptions } from 'sequelize/types/model';
+import { BaseModel } from '../database/base-sequelize.model';
 
 import { BaseSequelizeRepository } from '../database/base-sequelize.repository';
-import { BaseModel } from '../database/base-sequelize.model';
 
 /** base service */
 @Injectable()
@@ -23,6 +23,34 @@ export class BaseService<T = typeof BaseModel, M = BaseModel> {
    */
   create(data: Partial<M>, options?: CreateOptions<T>): Promise<Model<T, T>> {
     return this.baseRepository.create(data, options);
+  }
+
+  /**
+   * validation - validating item;
+   * @returns {Promise<T>}
+   * @param data
+   * @param exists
+   * @param customMessage
+   */
+  async validation(data: Partial<T>, exists?: boolean, customMessage?: string): Promise<Model<T, T>> {
+    const item = await this.getOne<T>(data);
+
+    if (item && exists) {
+      throw new ForbiddenException(customMessage || `${this.name} is already created`);
+    } else if (!item && !exists) {
+      throw new NotFoundException(customMessage || `${this.name} not found`);
+    }
+
+    return item;
+  }
+
+  /**
+   * getOne - get one item;
+   * @param {K} query - search an item by query;
+   * @returns {Promise<T>} - item from db;
+   */
+  getOne<T, K = Partial<T>>(query: K) {
+    return this.baseRepository.findOne(query);
   }
 
   // findOne(data: Partial<M>): Promise<Model<T, T>> {

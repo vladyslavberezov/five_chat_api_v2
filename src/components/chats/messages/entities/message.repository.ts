@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseSequelizeRepository } from '../../../../core/database/base-sequelize.repository';
 import { ModelsTypes } from '../../../../core/helpers/models.enum';
-import { Message } from './message.entity';
 import { UserChats } from '../../user-chats/entities/user-chats.entity';
+import { Message } from './message.entity';
 
 /** user db operations repository */
 @Injectable()
@@ -22,12 +22,12 @@ export class MessageRepository extends BaseSequelizeRepository<typeof Message, M
     return userChat.messages;
   }
 
-  saveMessage(userId, data) {
-    const { userChatId, message, uuid } = data;
+  saveMessage(data) {
+    const { userChatId, text, uuid } = data;
     return Message.create({
-      text: message,
+      text: text,
       userChatId,
-      authorId: userId,
+      authorId: data.authorId,
       uuid,
     });
   }

@@ -2,7 +2,7 @@
 export enum SocketsActions {
   NOTIFICATION_SEND = 'notification:send:',
 
-  CHATS_MESSAGE_CREATE = 'chats:post',
+  CHATS_MESSAGE_CREATE = 'message:post',
   CHATS_MESSAGE_DELETE = 'chats:delete',
   CHATS_MESSAGE_DELETE_RESPONSE = 'chats:delete:response',
   CHATS_MESSAGE_UPDATE = 'chats:update',
