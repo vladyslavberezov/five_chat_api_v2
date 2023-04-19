@@ -1,21 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsDate, IsOptional } from 'class-validator';
+import { InferAttributes, InferCreationAttributes } from 'sequelize';
 import {
   AllowNull,
   BelongsTo,
   Column,
   CreatedAt,
   DataType,
-  Default,
   ForeignKey,
   Model,
   Table,
   UpdatedAt,
 } from 'sequelize-typescript';
-import { InferAttributes, InferCreationAttributes } from 'sequelize';
 import { UserChats } from '../../user-chats/entities/user-chats.entity';
-import { IsDate, IsOptional } from 'class-validator';
 
-export type TModelMessage = Model<typeof Message>;
+// export type TModelMessage = Model<typeof Message>;
 
 @Table
 export class Message extends Model<InferAttributes<Message>, InferCreationAttributes<Message>> {
@@ -42,9 +41,12 @@ export class Message extends Model<InferAttributes<Message>, InferCreationAttrib
   text: string;
 
   /** isRead */
-  @ApiProperty({ required: false })
-  @Default(false)
-  @Column(DataType.BOOLEAN)
+  @ApiProperty({ required: true })
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  // @Default(false)
   isRead: boolean;
 
   /** uuid */

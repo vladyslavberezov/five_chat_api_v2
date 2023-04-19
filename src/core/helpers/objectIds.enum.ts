@@ -1,7 +1,5 @@
 /** operationIds */
 export enum OperationIds {
-  HEALTH_CHECK = 'getHealth',
-
   USERS_CREATE = 'create',
   USERS_GET_ME = 'getMe',
 

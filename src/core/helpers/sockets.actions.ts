@@ -3,6 +3,8 @@ export enum SocketsActions {
   NOTIFICATION_SEND = 'notification:send:',
 
   CHATS_MESSAGE_CREATE = 'message:post',
+  CHATS_MESSAGE_MARK_AS_READ = 'message:read',
+  CHATS_MESSAGE_MARK_AS_READ_RESPONSE = 'message:read:response',
   CHATS_MESSAGE_DELETE = 'chats:delete',
   CHATS_MESSAGE_DELETE_RESPONSE = 'chats:delete:response',
   CHATS_MESSAGE_UPDATE = 'chats:update',
@@ -10,9 +12,6 @@ export enum SocketsActions {
 
   CHAT_IS_HIDDEN_TOGGLE = 'chats:isHiddenToggle',
   CHAT_IS_HIDDEN_TOGGLE_RESPONSE = 'chats:isHiddenToggle:response',
-
-  CHAT_MESSAGES_MARK_AS_READ = 'chats:markAsRead',
-  CHAT_MESSAGES_MARK_AS_READ_RESPONSE = 'chats:markAsRead:response',
 
   CHAT_MEMBER_GET_BY_CHAT_ID = 'chats:chatMemberGetByChatId',
   CHAT_MEMBER_GET_BY_CHAT_ID_RESPONSE = 'chats:chatMemberGetByChatId:response',

@@ -1,5 +1,5 @@
-import * as nconf from 'nconf';
 import * as _ from 'lodash';
+import * as nconf from 'nconf';
 import { staticConfig } from './static/config';
 
 nconf.env().argv();

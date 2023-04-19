@@ -20,12 +20,12 @@ export class AuthService {
     if (!data) {
       new UnauthorizedException('Wrong credentials!');
     }
-    const isPasswordValid = await bcrypt.compare(user.password, data['password']);
+    const isPasswordValid = bcrypt.compare(user.password, data['password']);
     if (!isPasswordValid) {
       return new UnauthorizedException('Wrong credentials!');
     }
     const expiresInMs = ms(config.jwtExpire);
-    const payload = { nickname: user.nickname, sub: data.id };
+    const payload = { nickname: user.userCred, sub: data.id };
     return {
       accessToken: this.jwtService.sign(payload),
       expiresAt: new Date(Date.now() + expiresInMs),
@@ -33,7 +33,11 @@ export class AuthService {
   }
 
   checkAuth(client): Promise<any> {
-    const { authorization: accessToken } = client.handshake.headers;
-    return this.jwtService.verifyAsync(accessToken, { secret: config.jwtSecret });
+    try {
+      const { authorization: accessToken } = client.handshake.headers;
+      return this.jwtService.verifyAsync(accessToken, { secret: config.jwtSecret });
+    } catch (e) {
+      console.log('error', e);
+    }
   }
 }

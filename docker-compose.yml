@@ -1,0 +1,58 @@
+services:
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    networks:
+      - api-network
+    command: redis-server
+    volumes:
+      - docker-nest-postgres:/var/lib/redis/data
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1111
+    networks:
+      - api-network
+    ports:
+      - '5432:5432'
+    volumes:
+      - docker-nest-postgres:/var/lib/postgresql/data
+
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: development
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+    environment:
+      DB_HOST: postgres
+      DB_PASSWORD: 1111
+      DB_USER_ENTRY: postgres
+
+    # Run in dev Mode: npm run start:dev
+    command: npm run start:dev
+    ports:
+      - 3001:3001
+    networks:
+      - api-network
+    depends_on:
+      - postgres
+      - redis
+
+
+volumes:
+  docker-nest-postgres:
+    driver: local
+
+networks:
+  api-network:
+    driver: bridge

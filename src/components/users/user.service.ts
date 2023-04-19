@@ -1,5 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { Op } from 'sequelize';
 import { BaseService } from '../../core/base-services/base-service';
 import { AuthLoginReqDto } from '../auth/dto/auth.login.req.dto';
 import { CreateUserReqDto } from './dto/create-user.dto';
@@ -36,7 +37,14 @@ export class UserService extends BaseService<typeof User, User> {
   findOne(user: AuthLoginReqDto) {
     return this.userRepository.findOne({
       where: {
-        nickname: user.nickname,
+        [Op.or]: [
+          {
+            nickname: user.userCred,
+          },
+          {
+            email: user.userCred,
+          },
+        ],
       },
       attributes: {
         include: ['password'],

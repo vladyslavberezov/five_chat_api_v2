@@ -5,6 +5,7 @@ import { MessageRepository } from './entities/message.repository';
 
 @Injectable()
 export class MessageService extends BaseService<typeof Message, Message> {
+  // private static messageRepository: MessageRepository;
   constructor(private readonly messageRepository: MessageRepository) {
     super(messageRepository, 'Message');
   }
@@ -47,4 +48,7 @@ export class MessageService extends BaseService<typeof Message, Message> {
   //   await message.save();
   //   return message;
   // }
+  async updateMessage(param) {
+    await this.messageRepository.update(param);
+  }
 }

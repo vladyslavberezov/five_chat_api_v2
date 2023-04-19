@@ -1,17 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 /** login payload */
 export class AuthLoginReqDto {
+  // /** nickname */
+  // @ApiProperty({
+  //   description: 'nickname',
+  //   required: false,
+  //   format: 'string',
+  // })
+  // @IsString()
+  // nickname?: string;
+
   /** nickname */
   @ApiProperty({
-    description: 'nickname',
+    description: 'userCred',
     required: true,
     format: 'string',
   })
-  @IsString()
   @IsNotEmpty()
-  nickname: string;
+  @IsString()
+  userCred: string;
 
   /** password */
   @ApiProperty({
@@ -19,7 +28,7 @@ export class AuthLoginReqDto {
     required: true,
     format: 'string',
   })
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   password: string;
 }
