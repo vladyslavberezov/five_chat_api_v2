@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-// import { IoAdapter } from '@nestjs/platform-socket.io';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as bodyParser from 'body-parser';
 import { useContainer } from 'class-validator';
 import * as compression from 'compression';
@@ -28,6 +27,16 @@ async function bootstrap() {
 
   /** app instance */
   const app = await NestFactory.create(AppModule, nestConfig);
+  app.connectMicroservice<MicroserviceOptions>(
+    {
+      transport: Transport.TCP,
+      options: {
+        port: 3003,
+      },
+    },
+    { inheritAppConfig: true },
+  );
+  await app.startAllMicroservices();
   // if (IS_NODE_PRODUCTION) {
   //   Sentry.init({
   //     dsn: 'https://72e0a633b8b048ccb8e0aa5c67a1fc1e@o548694.ingest.sentry.io/4503930282835968',

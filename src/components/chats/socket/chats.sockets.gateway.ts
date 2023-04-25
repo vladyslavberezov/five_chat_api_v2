@@ -92,7 +92,7 @@ export class ChatsSocketsGateway {
       this.socketSender(
         sockets,
         SocketsActions.CHATS_MESSAGE_MARK_AS_READ,
-        SocketsActions.CHATS_THREAD_MESSAGES_MARK_AS_READ_RESPONSE,
+        SocketsActions.CHATS_MESSAGE_MARK_AS_READ_RESPONSE,
       );
     } catch (e) {
       console.log(e.message);

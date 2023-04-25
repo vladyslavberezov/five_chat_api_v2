@@ -3,8 +3,8 @@ export enum SocketsActions {
   NOTIFICATION_SEND = 'notification:send:',
 
   CHATS_MESSAGE_CREATE = 'message:post',
-  CHATS_MESSAGE_MARK_AS_READ = 'message:read',
-  CHATS_MESSAGE_MARK_AS_READ_RESPONSE = 'message:read:response',
+  CHATS_MESSAGE_MARK_AS_READ = 'message:read:response',
+  CHATS_MESSAGE_MARK_AS_READ_RESPONSE = 'message:read',
   CHATS_MESSAGE_DELETE = 'chats:delete',
   CHATS_MESSAGE_DELETE_RESPONSE = 'chats:delete:response',
   CHATS_MESSAGE_UPDATE = 'chats:update',
